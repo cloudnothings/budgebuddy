@@ -54,17 +54,6 @@ model User {
     transactions         Transaction[]
     RecurringTransaction RecurringTransaction[]
     Notification         Notification[]
-    UserSettings         UserSettings[]
-}
-
-model UserSettings {
-    id       String @id @default(cuid())
-    userId   String
-    user     User   @relation(fields: [userId], references: [id])
-    currency String
-    locale   String
-
-    @@index([userId])
 }
 
 model Document {
@@ -92,9 +81,6 @@ model Budget {
     name         String
     description  String?
     invitations  BudgetInvitation[]
-    totalBudget  Float
-    startDate    DateTime
-    endDate      DateTime
     categories   Category[]
     budgetAccess BudgetAccess[]
     Transaction  Transaction[]
@@ -132,7 +118,6 @@ model BudgetAccess {
 model Category {
     id                   String                 @id @default(cuid())
     name                 String
-    priority             Int
     parentCategoryId     String?
     parentCategory       Category?              @relation("SubCategory", fields: [parentCategoryId], references: [id])
     subCategories        Category[]             @relation("SubCategory")

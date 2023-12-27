@@ -1,19 +1,14 @@
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/4Nl7bjzf2sn
- */
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
 import { CardStackPlusIcon } from "@radix-ui/react-icons"
+import CreateBudgetModal from "./new-budget-modal"
 
 export default function NoBudgetsView() {
   return (
-    <main className="flex flex-col justify-center items-center h-screen bg-[#f1f5f9]">
+    <main className="flex flex-col justify-center items-center p-8">
       <Card className="max-w-md w-full">
         <CardHeader className="pb-4">
-          <CardTitle className="text-2xl text-center">Welcome to Budget Planner</CardTitle>
-          <CardDescription className="text-gray-500 text-center">
+          <CardTitle className="text-2xl text-center">Welcome to Budge Buddy</CardTitle>
+          <CardDescription className="text-center">
             Create your first budget to start planning your finances.
           </CardDescription>
         </CardHeader>
@@ -22,9 +17,7 @@ export default function NoBudgetsView() {
           <p className="mb-4 text-center text-gray-600">
             You have no budgets yet. Click the button below to create one.
           </p>
-          <Link className="self-stretch" href="#">
-            <Button className="w-full h-12 text-white bg-[#3b82f6] hover:bg-[#2563eb]">Create Budget</Button>
-          </Link>
+          <CreateBudgetModal />
         </CardContent>
       </Card>
     </main>
