@@ -107,7 +107,7 @@ model BudgetAccess {
     userId   String
     user     User   @relation(fields: [userId], references: [id])
     budgetId String
-    budget   Budget @relation(fields: [budgetId], references: [id])
+    budget   Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
     role     Role
 
     @@unique([userId, budgetId])

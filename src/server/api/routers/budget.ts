@@ -1,12 +1,11 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { TRPCError } from "@trpc/server";
 
 const DEFAULT_CATEGORIES = [
   {
-    parent: "Bills",
-    children: [
+    category: "Bills",
+    subcategories: [
       "Rent",
       "Water",
       "Gas/Heating",
@@ -21,8 +20,8 @@ const DEFAULT_CATEGORIES = [
     ],
   },
   {
-    parent: "Needs",
-    children: [
+    category: "Needs",
+    subcategories: [
       "Groceries",
       "Annual credit card fees",
       "Gas",
@@ -38,8 +37,8 @@ const DEFAULT_CATEGORIES = [
     ],
   },
   {
-    parent: "Wants",
-    children: [
+    category: "Wants",
+    subcategories: [
       "Dining out",
       "Entertainment",
       "Vacation",
@@ -55,78 +54,73 @@ const DEFAULT_CATEGORIES = [
 ] as const;
 
 export const budgetRouter = createTRPCRouter({
+  list: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.budget.findMany({
+      where: {
+        budgetAccess: {
+          some: {
+            userId: ctx.session.user.id,
+          },
+        },
+      },
+      include: {
+        budgetAccess: true,
+      },
+    });
+  }),
   create: protectedProcedure
     .input(z.object({ name: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return await ctx.db.$transaction(async (prisma) => {
-        const budget = await prisma.budget.create({
-          data: {
-            name: input.name,
-          },
-        });
-        // Create parent categories first
-        DEFAULT_CATEGORIES.map(async (category) => {
-          const parent = await prisma.category.create({
-            data: {
-              name: category.parent,
-              budgetId: budget.id,
+      const budget = await ctx.db.budget.create({
+        data: {
+          name: input.name,
+          budgetAccess: {
+            create: {
+              userId: ctx.session.user.id,
+              role: "OWNER",
             },
-          });
-          category.children.map(async (child) => {
-            await prisma.category.create({
-              data: {
-                name: child,
-                parentCategoryId: parent.id,
-                budgetId: budget.id,
-              },
-            });
-          });
-        });
-
-        await prisma.budgetAccess.create({
+          },
+        },
+      });
+      for (const category of DEFAULT_CATEGORIES) {
+        const parentCategory = await ctx.db.category.create({
           data: {
-            role: "OWNER",
-            userId: ctx.session.user.id,
+            name: category.category,
             budgetId: budget.id,
           },
         });
-        return budget.id;
-      });
+        for (const subCategory of category.subcategories) {
+          await ctx.db.category.create({
+            data: {
+              name: subCategory,
+              budgetId: budget.id,
+              parentCategoryId: parentCategory.id,
+            },
+          });
+        }
+      }
+      return budget.id;
     }),
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      try {
-        const permissions = await ctx.db.budgetAccess.findUnique({
-          where: {
-            userId_budgetId: {
+      return await ctx.db.budget.findFirst({
+        where: {
+          id: input.id,
+          budgetAccess: {
+            some: {
               userId: ctx.session.user.id,
-              budgetId: input.id,
             },
           },
-        });
-        if (!permissions) {
-          throw new Error("No permissions");
-        }
-        return await ctx.db.budget.findUnique({
-          where: { id: input.id },
-          include: {
-            budgetAccess: true,
-            categories: {
-              include: {
-                parentCategory: {
-                  include: {
-                    subCategories: true,
-                  },
-                },
-              },
+        },
+        include: {
+          budgetAccess: true,
+          categories: {
+            include: {
+              subCategories: true,
             },
           },
-        });
-      } catch (e) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-        });
-      }
+        },
+      });
     }),
 });
