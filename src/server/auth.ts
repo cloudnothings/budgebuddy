@@ -5,7 +5,7 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-
+import "server-only";
 import { env } from "@/env";
 import { db } from "@/server/db";
 
