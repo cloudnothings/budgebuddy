@@ -6,11 +6,10 @@ import Link from "next/link"
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar"
 import { DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
 import { DotIcon } from "@radix-ui/react-icons"
-import { getServerAuthSession } from "@/server/auth"
 import { Button } from "./ui/button"
-import SignOutButton from "./sign-out-button"
-import SignInButton from "./sign-in-button"
 import { ThemeToggle } from "./theme-switcher"
+import { auth } from "@/auth"
+import { SignIn, SignOut } from "./auth-components"
 
 function getInitials(name: string) {
   const [firstName, lastName] = name.split(" ")
@@ -21,7 +20,7 @@ function getInitials(name: string) {
 }
 
 export default async function Navbar() {
-  const session = await getServerAuthSession()
+  const session = await auth()
   return (
     <>
       <header className="flex justify-between p-4 border-b shadow-sm">
@@ -37,9 +36,8 @@ export default async function Navbar() {
   )
 }
 
-
 export async function AccountNav() {
-  const session = await getServerAuthSession()
+  const session = await auth()
   return (
     <nav className="flex items-center gap-4">
       <ThemeToggle />
@@ -57,15 +55,13 @@ export async function AccountNav() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <SignOutButton>
-                Sign Out
-              </SignOutButton>
+              <SignOut />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
         <div className="flex gap-4">
-          <SignInButton />
+          <SignIn />
           <Link href={'/signup'}>
             <Button>Start for free</Button>
           </Link>

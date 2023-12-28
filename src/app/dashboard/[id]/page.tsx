@@ -1,16 +1,17 @@
+import { auth } from "@/auth"
 import { Card, CardContent } from "@/components/ui/card"
-import { getServerAuthSession } from "@/server/auth"
-import { api } from "@/trpc/server"
+import { getBudget } from "@/data-layer/budgets"
+
 import { redirect } from "next/navigation"
 
 export default async function BudgetPage({ params }: {
   params: { id: string }
 }) {
-  const session = await getServerAuthSession()
+  const session = await auth()
   if (!session) {
     redirect('/')
   }
-  const budget = await api.budget.get.query({ id: params.id })
+  const budget = await getBudget(params.id, session.user.id)
 
   if (!budget) {
     redirect('/dashboard')

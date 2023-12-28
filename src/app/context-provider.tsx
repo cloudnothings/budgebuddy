@@ -1,8 +1,11 @@
 "use client";
+
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "./theme-provider";
+import { ToastProvider } from "@/components/ui/toast";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-export function ContextProvider({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
@@ -10,7 +13,13 @@ export function ContextProvider({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <SessionProvider>{children}</SessionProvider>
+      <SessionProvider>
+        <ToastProvider>
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
+        </ToastProvider>
+      </SessionProvider>
     </ThemeProvider>
   );
 }

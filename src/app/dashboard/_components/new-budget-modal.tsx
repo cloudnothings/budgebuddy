@@ -8,20 +8,17 @@ import { DialogTrigger, DialogTitle, DialogDescription, DialogHeader, DialogFoot
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { CardContent } from "@/components/ui/card"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { api } from "@/trpc/react"
+
 
 export default function CreateBudgetModal() {
-
-  const router = useRouter();
   const [name, setName] = useState("");
-  const createBudget = api.budget.create.useMutation({
-    onSuccess: (data) => {
-      router.push('/dashboard/' + data);
-      setName("");
-    },
-  });
+  // const createBudget = api.budget.create.useMutation({
+  //   onSuccess: (data) => {
+  //     router.push('/dashboard/' + data);
+  //     setName("");
+  //   },
+  // });
   return (
     <main key="1">
       <Dialog>
@@ -31,7 +28,7 @@ export default function CreateBudgetModal() {
         <DialogContent className="sm:max-w-[600px]">
           <form onSubmit={(e) => {
             e.preventDefault();
-            createBudget.mutate({ name })
+            // createBudget.mutate({ name })
           }}
           >
             <DialogHeader>

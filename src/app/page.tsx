@@ -1,10 +1,9 @@
-import { getServerAuthSession } from "@/server/auth";
 import LandingPage from "./_components/landing";
 import { redirect } from "next/navigation";
-
+import { auth } from "@/auth";
 
 export default async function Home() {
-  const session = await getServerAuthSession();
+  const session = await auth()
   if (session) {
     redirect('/dashboard')
   }

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import * as React from "react"
 import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons"
 import useEmblaCarousel, {
@@ -53,11 +57,10 @@ const Carousel = React.forwardRef<
     },
     ref
   ) => {
-    const [carouselRef, api] = useEmblaCarousel(
-      {
-        ...opts,
-        axis: orientation === "horizontal" ? "x" : "y",
-      },
+    const [carouselRef, api] = useEmblaCarousel({
+      ...opts,
+      axis: orientation === "horizontal" ? "x" : "y",
+    },
       plugins
     )
     const [canScrollPrev, setCanScrollPrev] = React.useState(false)
