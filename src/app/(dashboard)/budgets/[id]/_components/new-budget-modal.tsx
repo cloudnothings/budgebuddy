@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input"
 import { CardContent } from "@/components/ui/card"
 import { useState } from "react"
 
-
 export default function CreateBudgetModal() {
   const [name, setName] = useState("");
   // const createBudget = api.budget.create.useMutation({

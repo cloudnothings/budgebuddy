@@ -1,7 +1,8 @@
-import NoBudgetsView from "./_components/no-budgets-homescreen";
+
 import { redirect } from "next/navigation";
 import { getBudgetsForUser } from "@/data-layer/budgets";
 import { auth } from "@/auth";
+import NoBudgetsView from "./_components/no-budgets-homescreen";
 
 
 export default async function DashboardPage() {
@@ -13,5 +14,5 @@ export default async function DashboardPage() {
   if (!budgets.length) return (
     <NoBudgetsView />
   )
-  redirect(`/dashboard/${budgets[0]?.id}`)
+  redirect(`/budgets/${budgets[0]?.id}`)
 }
