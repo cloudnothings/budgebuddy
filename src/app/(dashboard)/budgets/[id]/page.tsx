@@ -1,5 +1,4 @@
 import { auth } from "@/auth"
-import { RichMarkdownEditor } from "@/components/rich-markdown-editor"
 import { Card, CardContent } from "@/components/ui/card"
 import { getBudget } from "@/data-layer/budgets"
 import { redirect } from "next/navigation"
@@ -28,7 +27,7 @@ export default async function BudgetPage({ params }: {
           ))}
         </CardContent>
       </Card>
-      <RichMarkdownEditor />
+
     </div>
   )
 }
