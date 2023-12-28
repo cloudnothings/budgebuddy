@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import type { DefaultSession, NextAuthConfig } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import Google from "next-auth/providers/google";
 import { db } from "./db";
 declare module "next-auth" {
@@ -11,7 +12,11 @@ declare module "next-auth" {
 }
 
 export const config = {
+  adapter: PrismaAdapter(db),
   providers: [Google],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
     async jwt({ token }) {
       const dbUser = await db.user.findFirst({
@@ -36,7 +41,6 @@ export const config = {
         session.user.email = token.email;
         session.user.image = token.picture;
       }
-
       return session;
     },
   },
