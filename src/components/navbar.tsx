@@ -5,7 +5,6 @@
 import Link from "next/link"
 import { AvatarImage, AvatarFallback, Avatar } from "@/components/ui/avatar"
 import { DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuContent, DropdownMenu } from "@/components/ui/dropdown-menu"
-import { DotIcon } from "@radix-ui/react-icons"
 import { Button } from "./ui/button"
 import { ThemeToggle } from "./theme-switcher"
 import { auth } from "@/auth"
@@ -20,13 +19,11 @@ function getInitials(name: string) {
 }
 
 export default async function Navbar() {
-  const session = await auth()
   return (
     <>
-      <header className="flex justify-between p-4 border-b shadow-sm">
+      <header className="flex justify-between p-4 shadow-sm">
         <div className="flex items-center">
-          <DotIcon className="w-6 h-6 mr-2" />
-          <Link className="text-2xl font-bold" href={session ? '/dashboard' : '/'}>
+          <Link className="text-3xl font-bold" href={'/'}>
             Budge Buddy
           </Link>
         </div>
