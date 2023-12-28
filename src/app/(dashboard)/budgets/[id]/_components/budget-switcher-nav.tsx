@@ -7,7 +7,8 @@ import { redirect } from "next/navigation"
 export default function BudgetSwitcherNav({ budgets, defaultBudgetId }: { budgets: Budget[], defaultBudgetId: string }) {
   return (
     <Select onValueChange={(id) => {
-      redirect(`/dashboard/${id}`)
+      if (id === defaultBudgetId) return
+      redirect(`/budgets/${id}`)
     }}>
       <SelectTrigger className="w-48" >
         <SelectValue defaultValue={defaultBudgetId} placeholder={budgets.find((e) => e.id === defaultBudgetId)?.name} />
