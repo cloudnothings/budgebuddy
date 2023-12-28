@@ -1,8 +1,8 @@
 import { db } from "@/db";
-import { unstable_noStore } from "next/cache";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function getBudget(id: string, userId: string) {
-  unstable_noStore();
+  noStore();
   return await db.budget.findFirst({
     where: {
       id,
@@ -23,7 +23,7 @@ export async function getBudget(id: string, userId: string) {
   });
 }
 export async function getBudgetsForUser(userId: string) {
-  unstable_noStore();
+  noStore();
   return await db.budget.findMany({
     where: {
       budgetAccess: {
@@ -39,6 +39,7 @@ export async function getBudgetsForUser(userId: string) {
 }
 
 export async function createBudget(name: string, userId: string) {
+  noStore();
   const budget = await db.budget.create({
     data: {
       name,
