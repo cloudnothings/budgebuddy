@@ -7,6 +7,48 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+// VerificationToken model for account verification
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+// User model to manage user information
+model User {
+    id                String             @id @default(uuid())
+    name              String
+    email             String             @unique
+    emailVerified     DateTime?
+    image             String?
+    createdAt         DateTime           @default(now())
+    updatedAt         DateTime           @updatedAt
+    accounts          Account[]
+    sessions          Session[]
+    budgetAccess      BudgetAccess[]
+    transactions      Transaction[]
+    financialAccounts FinancialAccount[]
+    payees            Payee[]
+    notifications     Notification[]
+    budgets           Budget[]
+}
+
+// Notification model for user notifications
+model Notification {
+    id        String   @id @default(uuid())
+    userId    String
+    message   String
+    createdAt DateTime @default(now())
+    read      Boolean  @default(false)
+
+    user User @relation(fields: [userId], references: [id])
+
+    @@index([userId])
+}
+
+// Account model for OAuth integration
 model Account {
     id                String  @id @default(cuid())
     userId            String
@@ -26,6 +68,7 @@ model Account {
     @@index([userId])
 }
 
+// Session model for user sessions
 model Session {
     id           String   @id @default(cuid())
     sessionToken String   @unique
@@ -36,74 +79,184 @@ model Session {
     @@index([userId])
 }
 
+// Enum for roles in budget access
 enum Role {
     OWNER
     CONTRIBUTOR
     READER
 }
 
-model User {
-    id                   String                 @id @default(cuid())
-    name                 String
-    email                String                 @unique
-    emailVerified        DateTime?
-    image                String?
-    accounts             Account[]
-    sessions             Session[]
-    budgetAccess         BudgetAccess[]
-    transactions         Transaction[]
-    RecurringTransaction RecurringTransaction[]
-    Notification         Notification[]
+// Budget model representing each budget created by a user
+model Budget {
+    id                         String                      @id @default(uuid())
+    name                       String
+    description                String?
+    ownerId                    String                      @map("userId")
+    owner                      User                        @relation(fields: [ownerId], references: [id])
+    categories                 Category[]
+    transactions               Transaction[]
+    budgetAccess               BudgetAccess[]
+    scheduledTransactionGroups ScheduledTransactionGroup[]
+
+    @@index([ownerId])
 }
 
-model Document {
-    id            String      @id @default(cuid())
+// Category model for categorizing transactions
+model Category {
+    id                        String                      @id @default(uuid())
+    name                      String
+    budgetId                  String
+    budget                    Budget                      @relation(fields: [budgetId], references: [id])
+    transactions              Transaction[]
+    subCategories             Category[]                  @relation("ParentCategory")
+    parentCategoryId          String?                     @map("parentId")
+    parentCategory            Category?                   @relation("ParentCategory", fields: [parentCategoryId], references: [id])
+    subTransactions           SubTransaction[]
+    payees                    Payee[]
+    scheduledTransactions     ScheduledTransaction[]
+    ScheduledTransactionGroup ScheduledTransactionGroup[]
+    ScheduledSubTransaction   ScheduledSubTransaction[]
+    MonthlySubcategoryBudget  MonthlySubcategoryBudget[]
+    CategoryTarget            CategoryTarget?
+
+    @@index([budgetId])
+    @@index([parentCategoryId])
+}
+
+// Transaction model for tracking all transactions
+model Transaction {
+    id                 String            @id @default(uuid())
+    amount             Float
+    date               DateTime
+    memo               String?
+    cleared            Boolean           @default(false)
+    categoryId         String?
+    category           Category?         @relation(fields: [categoryId], references: [id])
+    userId             String
+    user               User              @relation(fields: [userId], references: [id])
+    budgetId           String
+    budget             Budget            @relation(fields: [budgetId], references: [id])
+    financialAccountId String?
+    financialAccount   FinancialAccount? @relation(fields: [financialAccountId], references: [id])
+    subTransactions    SubTransaction[]
+    payeeId            String?
+    payee              Payee?            @relation(fields: [payeeId], references: [id])
+
+    @@index([date])
+    @@index([userId])
+    @@index([budgetId])
+    @@index([categoryId])
+}
+
+model DebtAccountDetails {
+    id                 String           @id @default(uuid())
+    financialAccountId String           @unique
+    financialAccount   FinancialAccount @relation(fields: [financialAccountId], references: [id])
+    startDate          DateTime?
+    originalBalance    Float?
+    interestRates      Json? // To store variable interest rates over time
+    minimumPayments    Json? // To store variable minimum payments over time
+    escrowAmounts      Json? // To store escrow amounts if applicable
+
+    @@index([financialAccountId])
+}
+
+model MonthlySubcategoryBudget {
+    id            String   @id @default(uuid())
+    subcategoryId String
+    subcategory   Category @relation(fields: [subcategoryId], references: [id])
+    month         DateTime
+    budgeted      Float
+    activity      Float
+    available     Float
+
+    @@index([subcategoryId])
+    @@index([month])
+}
+
+model CategoryTarget {
+    id               String     @id @default(uuid())
+    categoryId       String     @unique
+    category         Category   @relation(fields: [categoryId], references: [id])
+    targetType       TargetType
+    targetAmount     Float?
+    targetDate       DateTime?
+    frequency        String?
+    goalCreationDate DateTime?
+
+    @@index([categoryId])
+}
+
+enum TargetType {
+    NEEDED_FOR_SPENDING
+    SAVINGS_BALANCE
+    MONTHLY_SAVINGS_BUILDER
+    MONTHLY_DEBT_PAYMENT
+}
+
+// SubTransaction model for split transactions
+model SubTransaction {
+    id            String      @id @default(uuid())
     transactionId String
+    amount        Float
+    memo          String?
+    categoryId    String
+    category      Category    @relation(fields: [categoryId], references: [id])
     transaction   Transaction @relation(fields: [transactionId], references: [id])
-    url           String
 
     @@index([transactionId])
+    @@index([categoryId])
 }
 
-model Notification {
-    id        String   @id @default(cuid())
-    userId    String
-    user      User     @relation(fields: [userId], references: [id])
-    message   String
-    createdAt DateTime
-    read      Boolean  @default(false)
+// FinancialAccount model for managing user's financial accounts
+model FinancialAccount {
+    id                         String                      @id @default(uuid())
+    name                       String
+    balance                    Float
+    type                       FinancialAccountType
+    userId                     String
+    user                       User                        @relation(fields: [userId], references: [id])
+    transactions               Transaction[]
+    accountCalculations        AccountCalculation[]
+    scheduledTransactionGroups ScheduledTransactionGroup[]
+    debtAccountDetails         DebtAccountDetails?
 
     @@index([userId])
 }
 
-model Budget {
-    id           String             @id @default(cuid())
-    name         String
-    description  String?
-    invitations  BudgetInvitation[]
-    categories   Category[]
-    budgetAccess BudgetAccess[]
-    Transaction  Transaction[]
-
-    @@index([name])
+// Enum for financial account types
+enum FinancialAccountType {
+    CHECKING
+    SAVINGS
+    CREDIT_CARD
+    MORTGAGE
+    OTHER_ASSET
+    OTHER_LIABILITY
+    CASH
+    LINE_OF_CREDIT
+    MEDICAL_DEBT
+    STUDENT_LOAN
+    AUTO_LOAN
+    OTHER_DEBT
 }
 
-model BudgetInvitation {
-    id         String   @id @default(cuid())
-    budgetId   String
-    budget     Budget   @relation(fields: [budgetId], references: [id])
-    email      String
-    inviteCode String   @unique
-    createdAt  DateTime @default(now())
-    expiresAt  DateTime
-    maxUses    Int      @default(1)
-    usedCount  Int      @default(0)
+// Payee model for managing transaction payees
+model Payee {
+    id                         String                      @id @default(uuid())
+    name                       String
+    userId                     String
+    user                       User                        @relation(fields: [userId], references: [id])
+    defaultCategoryId          String?
+    defaultCategory            Category?                   @relation(fields: [defaultCategoryId], references: [id])
+    transactions               Transaction[]
+    scheduledTransactionGroups ScheduledTransactionGroup[]
 
-    @@index([budgetId])
+    @@index([userId])
 }
 
+// BudgetAccess model for managing access to budgets
 model BudgetAccess {
-    id       String @id @default(cuid())
+    id       String @id @default(uuid())
     userId   String
     user     User   @relation(fields: [userId], references: [id])
     budgetId String
@@ -111,62 +264,75 @@ model BudgetAccess {
     role     Role
 
     @@unique([userId, budgetId])
-    @@index([budgetId])
     @@index([userId])
-}
-
-model Category {
-    id                   String                 @id @default(cuid())
-    name                 String
-    parentCategoryId     String?
-    parentCategory       Category?              @relation("SubCategory", fields: [parentCategoryId], references: [id])
-    subCategories        Category[]             @relation("SubCategory")
-    budgetId             String
-    budget               Budget                 @relation(fields: [budgetId], references: [id])
-    transactions         Transaction[]
-    RecurringTransaction RecurringTransaction[]
-
-    @@index([name])
     @@index([budgetId])
-    @@index([parentCategoryId])
 }
 
-model RecurringTransaction {
-    id         String   @id @default(cuid())
-    amount     Float
-    startDate  DateTime
-    frequency  String
-    categoryId String
-    category   Category @relation(fields: [categoryId], references: [id])
-    userId     String
-    user       User     @relation(fields: [userId], references: [id])
+// AccountCalculation model for account calculations
+model AccountCalculation {
+    id                  String           @id @default(uuid())
+    financialAccountId  String
+    financialAccount    FinancialAccount @relation(fields: [financialAccountId], references: [id])
+    clearedBalance      Float
+    unclearedBalance    Float
+    transactionCount    Int
+    debtLastPaymentDate DateTime?
+    debtPayments        Float?
 
+    @@index([financialAccountId])
+}
+
+// ScheduledTransactionGroup model for scheduled transactions
+model ScheduledTransactionGroup {
+    id                    String                 @id @default(uuid())
+    budgetId              String
+    accountId             String
+    payeeId               String?
+    categoryId            String?
+    date                  DateTime
+    frequency             String
+    amount                Float
+    memo                  String?
+    flag                  String?
+    transferAccountId     String?
+    financialAccountId    String
+    budget                Budget                 @relation(fields: [budgetId], references: [id])
+    account               FinancialAccount       @relation(fields: [accountId], references: [id])
+    payee                 Payee?                 @relation(fields: [payeeId], references: [id])
+    category              Category?              @relation(fields: [categoryId], references: [id])
+    scheduledTransactions ScheduledTransaction[]
+
+    @@index([budgetId])
+    @@index([accountId])
+}
+
+// ScheduledTransaction model for individual scheduled transactions
+model ScheduledTransaction {
+    id                          String                    @id @default(uuid())
+    scheduledTransactionGroupId String
+    amount                      Float
+    memo                        String?
+    sortableIndex               Int
+    categoryId                  String?
+    scheduledTransactionGroup   ScheduledTransactionGroup @relation(fields: [scheduledTransactionGroupId], references: [id])
+    category                    Category?                 @relation(fields: [categoryId], references: [id])
+    scheduledSubTransactions    ScheduledSubTransaction[]
+
+    @@index([scheduledTransactionGroupId])
     @@index([categoryId])
-    @@index([userId])
 }
 
-model Transaction {
-    id         String     @id @default(cuid())
-    amount     Float
-    date       DateTime
-    categoryId String?
-    category   Category?  @relation(fields: [categoryId], references: [id])
-    budgetId   String
-    budget     Budget     @relation(fields: [budgetId], references: [id])
-    userId     String
-    user       User       @relation(fields: [userId], references: [id])
-    Document   Document[]
+// ScheduledSubTransaction model for sub-transactions within a scheduled transaction
+model ScheduledSubTransaction {
+    id                     String               @id @default(uuid())
+    scheduledTransactionId String
+    amount                 Float
+    memo                   String?
+    sortableIndex          Int
+    categoryId             String?
+    scheduledTransaction   ScheduledTransaction @relation(fields: [scheduledTransactionId], references: [id])
+    category               Category?            @relation(fields: [categoryId], references: [id])
 
-    @@index([date])
-    @@index([categoryId, date])
-    @@index([budgetId])
-    @@index([userId])
-}
-
-model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
-
-    @@unique([identifier, token])
+    @@index([scheduledTransactionId])
+    @@index([categoryId])
 }
