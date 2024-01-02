@@ -4,13 +4,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { type Budget } from "@prisma/client"
 import { redirect } from "next/navigation"
 
-export default function BudgetSwitcherNav({ budgets, defaultBudgetId }: { budgets: Budget[], defaultBudgetId: string }) {
+interface BudgetSwitcherNavProps extends React.HTMLAttributes<HTMLDivElement> {
+  budgets: Budget[]
+  defaultBudgetId: string
+}
+export default function BudgetSwitcherNav({ budgets, defaultBudgetId, className }: BudgetSwitcherNavProps) {
   return (
     <Select onValueChange={(id) => {
       if (id === defaultBudgetId) return
       redirect(`/budgets/${id}`)
     }}>
-      <SelectTrigger className="w-48" >
+      <SelectTrigger className={className} >
         <SelectValue defaultValue={defaultBudgetId} placeholder={budgets.find((e) => e.id === defaultBudgetId)?.name} />
       </SelectTrigger>
       <SelectContent>

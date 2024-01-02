@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { createBudget } from "@/data-layer/budgets";
+import { createDefaultBudget } from "@/data-layer/budgets";
 import { redirect } from "next/navigation";
 
 export async function createBudgetAction(formData: FormData) {
@@ -17,6 +17,6 @@ export async function createBudgetAction(formData: FormData) {
   if (name.length > 24) {
     return { error: "Max length is 24 characters" };
   }
-  const budget = await createBudget(name, session.user.id);
+  const budget = await createDefaultBudget(name, session.user.id);
   redirect(`/budgets/${budget}`);
 }

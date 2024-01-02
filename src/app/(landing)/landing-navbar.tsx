@@ -21,29 +21,33 @@ function getInitials(name: string) {
 }
 
 const ProductFeature = () => (
-  <div className="flex items-center">
+  <div className="mr-6 flex items-center space-x-2">
     <Link className="text-3xl font-bold" href={'/'}>
       Budge Buddy
     </Link>
   </div>
 )
+
 const Links = () => (
-  <div className="flex items-center text-xl gap-4">
+  <nav className='flex items-center gap-6 text-sm'>
     <Link href={'/'}>Home</Link>
     <Link href={'/budget'}>Budgets</Link>
-  </div>
+  </nav>
 )
+
 export default async function LandingNavbar() {
   return (
-    <>
-      <header className="flex justify-between items-center p-4 shadow-sm">
-        <div className="flex items-center gap-4">
+    <div className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 max-w-screen-2xl items-center">
+        <div className="mr-4 hidden md:flex">
           <ProductFeature />
           <Links />
         </div>
-        <AccountNav />
-      </header>
-    </>
+        <div className='flex flex-1 items-center justify-between space-x-2 md:justify-end'>
+          <AccountNav />
+        </div>
+      </div>
+    </div>
   )
 }
 

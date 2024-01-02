@@ -1,13 +1,10 @@
 import "@/styles/globals.css";
 
-import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from 'geist/font/mono'
 import { Providers } from "../providers";
 import { Toaster } from "@/components/ui/toaster";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
 
 export const metadata = {
   title: "Budge Buddy",
@@ -22,7 +19,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased ${inter.variable}`}>
+      <head />
+      <body className={`min-h-screen bg-background font-sans antialiased ${GeistSans.variable} ${GeistMono.variable}`}>
         <Providers>
           {children}
           <Toaster />

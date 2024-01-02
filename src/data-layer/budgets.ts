@@ -38,7 +38,7 @@ export async function getBudgetsForUser(userId: string) {
   });
 }
 
-export async function createBudget(name: string, userId: string) {
+export async function createDefaultBudget(name: string, userId: string) {
   noStore();
   const budget = await db.budget.create({
     data: {
@@ -49,6 +49,7 @@ export async function createBudget(name: string, userId: string) {
           role: "OWNER",
         },
       },
+      ownerId: userId,
     },
   });
   for (const category of DEFAULT_CATEGORIES) {

@@ -1,14 +1,11 @@
 import "@/styles/globals.css";
-
-import { Inter } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from 'geist/font/mono'
 import { Providers } from "../providers";
 import { Toaster } from "@/components/ui/toaster";
 import LandingNavbar from "./landing-navbar";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
+
 
 export const metadata = {
   title: "Budge Buddy",
@@ -23,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased ${inter.variable}`}>
+      <body className={`relative flex min-h-screen flex-col bg-background font-sans antialiased ${GeistSans.variable} ${GeistMono.variable}`}>
         <Providers>
           <LandingNavbar />
           {children}

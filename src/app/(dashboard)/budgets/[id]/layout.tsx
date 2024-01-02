@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
-
-import { Fragment } from "react";
 import DashboardNav from "./_components/dashboard-nav";
+import SidebarCookieProvider from "./_components/sidebar-cookie-provider";
 
 export const metadata = {
   title: "Budge Buddy",
@@ -9,14 +8,18 @@ export const metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
-export default function RootLayout(props: {
+export default function BudgetsLayout(props: {
   children: React.ReactNode;
   params: { id: string };
 }) {
   return (
-    <Fragment>
+    <div className="relative flex min-h-screen flex-col bg-background">
       <DashboardNav {...props} />
-      {props.children}
-    </Fragment>
+      <main className="flex-1">
+        <SidebarCookieProvider {...props} >
+          {props.children}
+        </SidebarCookieProvider>
+      </main>
+    </div>
   );
 }
