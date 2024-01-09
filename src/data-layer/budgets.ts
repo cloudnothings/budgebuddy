@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { db } from "@/db";
 import { unstable_noStore as noStore } from "next/cache";
 
@@ -14,13 +15,103 @@ export async function getBudget(id: string, userId: string) {
     },
     include: {
       budgetAccess: true,
-      categories: {
-        include: {
-          subCategories: true,
+    },
+  });
+}
+export async function updateMonthlySubcategoryBudgetAssignedAmount(
+  categoryId: string,
+  amount: number,
+  month: Date,
+  monthlySubcategoryBudgetId?: string,
+) {
+  noStore();
+  if (monthlySubcategoryBudgetId) {
+    return await db.monthlySubcategoryBudget.update({
+      where: {
+        id: monthlySubcategoryBudgetId,
+      },
+      data: {
+        assigned: amount,
+      },
+    });
+  }
+  const exists = await db.monthlySubcategoryBudget.findFirst({
+    where: {
+      month,
+      subcategory: {
+        id: categoryId,
+      },
+    },
+  });
+  if (exists) {
+    return await db.monthlySubcategoryBudget.update({
+      where: {
+        id: exists.id,
+      },
+      data: {
+        assigned: amount,
+      },
+    });
+  }
+  return await db.monthlySubcategoryBudget.create({
+    data: {
+      assigned: amount,
+      month,
+      subcategory: {
+        connect: {
+          id: categoryId,
         },
       },
     },
   });
+}
+export async function getBudgetData(id: string, month?: Date) {
+  noStore();
+  const user = await auth();
+  const selectedMonth =
+    month ?? new Date(new Date().getFullYear(), new Date().getMonth());
+  const budget = await db.budget.findFirst({
+    where: {
+      id,
+      budgetAccess: {
+        some: {
+          userId: user?.user.id,
+        },
+      },
+    },
+    include: {
+      budgetAccess: true,
+      categories: {
+        where: {
+          parentCategoryId: null,
+        },
+        include: {
+          subCategories: {
+            include: {
+              MonthlySubcategoryBudget: {
+                take: 1,
+                where: {
+                  month: selectedMonth,
+                },
+              },
+              transactions: {
+                where: {
+                  date: {
+                    gte: selectedMonth,
+                    lt: new Date(
+                      selectedMonth.getFullYear(),
+                      selectedMonth.getMonth() + 1,
+                    ),
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  return { ...budget, selectedMonth };
 }
 export async function getBudgetsForUser(userId: string) {
   noStore();

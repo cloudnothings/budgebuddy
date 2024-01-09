@@ -12,7 +12,7 @@ export default function SidebarCookieProvider(props: { children: React.ReactNode
     <BudgetSidebar {...props}
       defaultLayout={defaultLayout}
       defaultCollapsed={defaultCollapsed}
-      navCollapsedSize={4}
+      navCollapsedSize={8}
     >
       {props.children}
     </BudgetSidebar>

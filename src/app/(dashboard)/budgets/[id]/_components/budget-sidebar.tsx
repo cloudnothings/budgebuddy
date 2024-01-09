@@ -20,7 +20,7 @@ const BudgetSidebar = ({ defaultLayout = [20, 400], defaultCollapsed = false, na
         defaultSize={defaultLayout[0]}
         collapsedSize={navCollapsedSize}
         collapsible={true}
-        minSize={8}
+        minSize={12}
         maxSize={30}
         onCollapse={() => {
           setIsCollapsed(true)

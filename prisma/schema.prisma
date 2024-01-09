@@ -166,9 +166,7 @@ model MonthlySubcategoryBudget {
     subcategoryId String
     subcategory   Category @relation(fields: [subcategoryId], references: [id])
     month         DateTime
-    budgeted      Float
-    activity      Float
-    available     Float
+    assigned      Float
 
     @@index([subcategoryId])
     @@index([month])

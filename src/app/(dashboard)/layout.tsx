@@ -5,7 +5,6 @@ import { GeistMono } from 'geist/font/mono'
 import { Providers } from "../providers";
 import { Toaster } from "@/components/ui/toaster";
 
-
 export const metadata = {
   title: "Budge Buddy",
   description: "Make sharing a budget easy",
@@ -18,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <head />
       <body className={`min-h-screen bg-background font-sans antialiased ${GeistSans.variable} ${GeistMono.variable}`}>
         <Providers>
