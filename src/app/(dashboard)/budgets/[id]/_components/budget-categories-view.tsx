@@ -29,12 +29,8 @@ import { getBudgetDataAction, updateCategoryNameAction, updateMonthlySubcategory
 import { CalculatorIcon } from "lucide-react"
 import clsx from "clsx"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 
 export type BudgetItem = {
@@ -204,12 +200,10 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
 
         const isMainRow = row.getCanExpand()
         const rowId = row.original.id;
-        const formattedValue = React.useMemo(() => {
-          return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: "USD",
-          }).format(value)
-        }, [value])
+        const formattedValue = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(value)
         const handleBlur = async () => {
           await handleSubmit();
         };
@@ -239,24 +233,29 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
           });
         }
         return (
-          <TableCell className="w-[15%] items-center overflow-hidden" onClick={() => setEditMode(true)} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+          <TableCell
+            className="w-[15%] items-center overflow-hidden"
+            onClick={() => setEditMode(true)}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+          >
             {isMainRow
-              ? (<div className="h-6 flex items-center text-right justify-between">
-                <div></div>
-                {
-                  row.original.subCategories.length > 0 && new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                  }).format(row.original.subCategories?.reduce((acc, subCategory) => {
-                    if (subCategory.MonthlySubcategoryBudget.length > 0) {
-                      return acc + subCategory.MonthlySubcategoryBudget[0].assigned
-                    }
-                    return acc
-                  }, 0))
-                }
-
-              </div>)
-              : (
+              ? (<div className="h-6 flex  items-center text-right justify-end">
+                <div>
+                  {
+                    row.original.subCategories.length > 0 && new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(row.original.subCategories?.reduce((acc, subCategory) => {
+                      if (subCategory.MonthlySubcategoryBudget.length > 0) {
+                        return acc + subCategory.MonthlySubcategoryBudget[0].assigned
+                      }
+                      return acc
+                    }, 0))
+                  }
+                </div>
+              </div>
+              ) : (
                 <div className={clsx(hovered || editMode ? 'border-foreground' : "border-transparent",
                   "h-6 flex items-center text-right justify-between border rounded-sm overflow-hidden")}>
                   <button type="button" className={clsx(hovered || editMode ? "block" : "hidden")}>
