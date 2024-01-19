@@ -1,100 +1,35 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 "use client"
 
-import * as React from "react"
-
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
-  getExpandedRowModel,
-  useReactTable,
-  RowSelectionState,
-} from "@tanstack/react-table"
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Category, Transaction } from "@prisma/client"
-import { getBudgetDataAction, updateCategoryNameAction, updateMonthlySubcategoryBudgetAssignedAmountAction } from "../actions"
-import { CalculatorIcon } from "lucide-react"
-import clsx from "clsx"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { ColumnDef, ColumnFiltersState, RowSelectionState, SortingState, VisibilityState, flexRender, getCoreRowModel, getExpandedRowModel, getFilteredRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
+import { clsx } from "clsx"
+import React from "react"
+import { IndeterminateCheckbox } from "../../_components/indeterminate-checkbox"
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog"
-import { IndeterminateCheckbox } from "./indeterminate-checkbox"
+import { CalculatorIcon } from "lucide-react"
 
-export type BudgetItem = {
-  budgetId: string
+export type TransactionItem = {
   id: string
-  parentCategoryId: string | null
-  MonthlySubcategoryBudget: {
-    id: string,
-    assigned: number,
-    subcategoryId: string
-    month: Date
-  }[],
   name: string
-  assigned: number
+  amount: number
   available: number
-  activity: number
-  subCategories: Category & {
-    transactions: Transaction[],
-    MonthlySubcategoryBudget: { id: number, assigned: number, subcategoryId: string, month: Date }[]
+  assigned: number
+  subCategories: TransactionItem[]
+  MonthlySubcategoryBudget: {
+    id: string
+    assigned: number
   }[]
 }
 
-
-export default function BudgetCategoriesView({ month, data, budgetId }: { budgetId: string, month: Date, data: any[] }) {
-  const query = useQuery(['budget', month], {
-    queryFn: async () => {
-      return await getBudgetDataAction(budgetId, month)
-    },
-    initialData: data,
-    refetchOnWindowFocus: false,
-    staleTime: 10000
-  })
-
-  const assignedValueMutator = useMutation({
-    mutationFn: async (values: { subcategoryId: string, assigned: number, monthlyBudgetId: string | null }) => {
-      return await updateMonthlySubcategoryBudgetAssignedAmountAction(month, values.subcategoryId, values.assigned, values.monthlyBudgetId)
-    },
-  })
-
-  const categoryTitleMutator = useMutation({
-    mutationFn: async (values: { categoryId: string, name: string }) => {
-      return await updateCategoryNameAction(values.categoryId, values.name)
-    },
-  })
-
+const TransactionView = () => {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
-
-
-  const [expanded, setExpanded] = React.useState(() => {
-    return data.reduce((acc, row, index) => {
-      acc[index] = true;
-      return acc;
-    }, {});
-  });
-
-  const columns: ColumnDef<BudgetItem>[] = [
+  const columns: ColumnDef<TransactionItem>[] = [
     {
       accessorKey: 'name',
       header: ({ table }) => (
@@ -122,11 +57,6 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
           if (value === getValue()) {
             return;
           }
-          await categoryTitleMutator.mutateAsync({ categoryId: row.original.id, name: value }, {
-            onSuccess: () => {
-              void query.refetch()
-            }
-          });
         }
         const cancelHandler = () => {
           setValue(getValue() as string)
@@ -227,13 +157,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
             return;
           }
           setValue(cleanedInput);
-          await assignedValueMutator.mutateAsync({ subcategoryId: rowId, assigned: cleanedInput, monthlyBudgetId }, {
-            onSuccess: (e) => {
-              setMonthlyBudgetId(e.id)
-              void query.refetch()
-              setEditMode(false);
-            }
-          });
+
         }
         return (
           <TableCell
@@ -320,7 +244,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
     }
   ]
   const table = useReactTable({
-    data: query.data ?? [],
+    data: [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -331,16 +255,13 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onExpandedChange: setExpanded,
     state: {
       sorting,
-      expanded,
       columnFilters,
       columnVisibility,
       rowSelection,
     },
   })
-
   return (
     <div className="w-full">
       <Table>
@@ -407,3 +328,4 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
   )
 }
 
+export default TransactionView

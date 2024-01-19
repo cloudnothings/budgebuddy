@@ -97,6 +97,7 @@ model Budget {
     transactions               Transaction[]
     budgetAccess               BudgetAccess[]
     scheduledTransactionGroups ScheduledTransactionGroup[]
+    FinancialAccount           FinancialAccount[]
 
     @@index([ownerId])
 }
@@ -218,6 +219,8 @@ model FinancialAccount {
     accountCalculations        AccountCalculation[]
     scheduledTransactionGroups ScheduledTransactionGroup[]
     debtAccountDetails         DebtAccountDetails?
+    budgetId                   String
+    budget                     Budget                      @relation(fields: [budgetId], references: [id])
 
     @@index([userId])
 }

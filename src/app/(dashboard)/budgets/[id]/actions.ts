@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { updateMonthlySubcategoryBudgetAssignedAmount } from "@/data-layer/budgets";
 import { db } from "@/db";
-import { unstable_noStore } from "next/cache";
+import { unstable_noStore as noStore } from "next/cache";
 
 export async function updateMonthlySubcategoryBudgetAssignedAmountAction(
   month: Date,
@@ -22,7 +22,7 @@ export async function updateCategoryNameAction(
   categoryId: string,
   name: string,
 ) {
-  unstable_noStore();
+  noStore();
   const user = await auth();
 
   return await db.category.update({
@@ -42,7 +42,7 @@ export async function updateCategoryNameAction(
   });
 }
 export async function getBudgetDataAction(id: string, month: Date) {
-  unstable_noStore();
+  noStore();
   const user = await auth();
   const budget = await db.budget.findFirst({
     where: {

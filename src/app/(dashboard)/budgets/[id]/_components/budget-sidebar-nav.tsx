@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import AccountCreationDialog from "../accounts/_components/account-creation";
 
-export default function BudgetSidebarNav({ params }: { params: { id: string } }) {
+export default function BudgetSidebarNav({ params, isCollapsed }: { params: { id: string }, isCollapsed?: boolean }) {
   const paths = [
     'budget',
     'reports',
@@ -22,6 +23,8 @@ export default function BudgetSidebarNav({ params }: { params: { id: string } })
           </Link>
         )
       })}
+      {!isCollapsed && <AccountCreationDialog />}
     </div>
+
   )
 }
