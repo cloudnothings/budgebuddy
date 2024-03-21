@@ -5,23 +5,29 @@ import { updateMonthlySubcategoryBudgetAssignedAmount } from "@/data-layer/budge
 import { db } from "@/db";
 import { unstable_noStore as noStore } from "next/cache";
 
-export async function updateMonthlySubcategoryBudgetAssignedAmountAction(
-  
-  month: Date,
-  subcategoryId: string,
-  assignedAmount: number,
+export async function updateMonthlySubcategoryBudgetAssignedAmountAction({
+  budgetId,
+  monthlyBudgetId,
+  assignedAmount,
+  month,
+  subcategoryId,
+}: 
+  {budgetId: string,
   monthlyBudgetId: string | null,
-  budgetId: string,
+  assignedAmount: number,
+  month: Date,
+  subcategoryId: string,}
 ) {
-  return await updateMonthlySubcategoryBudgetAssignedAmount(
+  return await updateMonthlySubcategoryBudgetAssignedAmount({
     budgetId,
-    subcategoryId,
-    assignedAmount,
-    month,
-    monthlyBudgetId ?? undefined,
-
+    monthlySubcategoryBudgetId: monthlyBudgetId ?? undefined,
+    amount: assignedAmount,
+    categoryId: subcategoryId,
+    month
+  }
   );
 }
+
 export async function updateCategoryNameAction(
   categoryId: string,
   name: string,

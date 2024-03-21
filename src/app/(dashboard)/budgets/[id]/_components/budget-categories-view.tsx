@@ -68,7 +68,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
 
   const assignedValueMutator = useMutation({
     mutationFn: async (values: { subcategoryId: string, assigned: number, monthlyBudgetId: string | null }) => {
-      return await updateMonthlySubcategoryBudgetAssignedAmountAction(month, values.subcategoryId, values.assigned, values.monthlyBudgetId)
+      return await updateMonthlySubcategoryBudgetAssignedAmountAction({ assignedAmount: values.assigned, month, subcategoryId: values.subcategoryId, monthlyBudgetId: values.monthlyBudgetId, budgetId })
     },
   })
 

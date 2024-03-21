@@ -18,12 +18,18 @@ export async function getBudget(id: string, userId: string) {
     },
   });
 }
-export async function updateMonthlySubcategoryBudgetAssignedAmount(
-  budgetId: string,
+export async function updateMonthlySubcategoryBudgetAssignedAmount({
+  budgetId,
+  categoryId,
+  amount,
+  month,
+  monthlySubcategoryBudgetId,
+}:
+  {budgetId: string,
   categoryId: string,
   amount: number,
   month: Date,
-  monthlySubcategoryBudgetId?: string,
+  monthlySubcategoryBudgetId?: string,}
 ) {
   noStore();
   if (monthlySubcategoryBudgetId) {
