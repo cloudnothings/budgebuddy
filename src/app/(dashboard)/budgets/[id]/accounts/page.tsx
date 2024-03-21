@@ -1,16 +1,17 @@
 import { auth } from "@/auth"
-import { getAccounts as getAllAccounts } from "@/data-layer/financialAccount"
+
 import { redirect } from "next/navigation"
 import TransactionView from "./_components/transaction-view"
+import { getAccounts } from "@/data-layer/financialAccount"
 
-export default async function AccountsPage() {
+export default async function AccountsPage({ params }: { params: { id: string } }) {
   const session = await auth()
   if (!session) {
     redirect('/')
   }
-  const accounts = await getAllAccounts()
+  const accounts = await getAccounts(params.id)
 
   return (
-    <TransactionView />
+    <TransactionView accounts={accounts} />
   )
 }

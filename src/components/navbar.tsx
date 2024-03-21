@@ -52,7 +52,7 @@ export async function AccountNav() {
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <SignOut />
+              <SignOut className="h-4" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

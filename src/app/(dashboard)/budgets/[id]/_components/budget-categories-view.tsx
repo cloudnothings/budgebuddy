@@ -306,7 +306,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
     },
     {
       accessorKey: "available",
-      header: () => <div className="text-right">Available</div>,
+      header: () => <div className="text-right pr-4">Available</div>,
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("available") ?? 0)
 
@@ -315,7 +315,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
           style: "currency",
           currency: "USD",
         }).format(amount)
-        return <TableCell className="text-right font-medium w-[15%]">{formatted}</TableCell>
+        return <TableCell className="text-right pr-6 font-medium w-[15%]">{formatted}</TableCell>
       },
     }
   ]
@@ -342,7 +342,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
   })
 
   return (
-    <div className="w-full">
+    <div>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

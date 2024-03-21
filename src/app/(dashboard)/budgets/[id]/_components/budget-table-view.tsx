@@ -3,6 +3,7 @@ import AssignableMoney from "./assignable-money";
 import BudgetCategoriesView from "./budget-categories-view";
 import BudgetViewSelector from "./budget-view-selector";
 import MonthPicker from "./month-picker";
+import { ScrollArea } from "@/components/ui/scroll-area";
 export default async function BudgetTableView({ params }: { params: { id: string } }) {
   const data = await getBudgetData(params.id)
   return (
@@ -12,10 +13,10 @@ export default async function BudgetTableView({ params }: { params: { id: string
         <AssignableMoney />
       </div>
       <BudgetViewSelector />
-      <div className="p-2">
-        {/* @ts-ignore */}
-        <BudgetCategoriesView budgetId={params.id} data={data.categories} month={data.selectedMonth} />
-      </div>
+
+      {/* @ts-ignore */}
+      <BudgetCategoriesView budgetId={params.id} data={data.categories} month={data.selectedMonth} />
+
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
 import {
@@ -20,7 +20,7 @@ import { accountCreationFormSchema } from "@/lib/forms"
 import { createAccountAction } from "../actions"
 import { useRouter } from "next/navigation"
 
-export const AccountCreationDialog = () => {
+export const AccountCreationDialog = ({ budgetId }: { budgetId: string }) => {
   const router = useRouter()
   const form = useForm<z.infer<typeof accountCreationFormSchema>>({
     resolver: zodResolver(accountCreationFormSchema),
@@ -31,11 +31,12 @@ export const AccountCreationDialog = () => {
     }
   })
   async function onSubmit(values: z.infer<typeof accountCreationFormSchema>) {
-    await createAccountAction(values)
-    router.refresh()
+    const account = await createAccountAction({ ...values, budgetId })
+    router.push(`/budgets/${budgetId}/accounts/${account.id}`)
+
   }
   return (
-    <Dialog onOpenChange={() => form.reset()}>
+    <Dialog onOpenChange={() => form.reset()} >
       <DialogTrigger asChild>
         <Button variant={"outline"}>Create an account</Button>
       </DialogTrigger>
@@ -108,7 +109,9 @@ export const AccountCreationDialog = () => {
                 </FormControl>
               </FormItem>
             )} />
-            <Button type="submit">Save changes</Button>
+            <DialogClose asChild>
+              <Button type="submit">Save changes</Button>
+            </DialogClose>
           </form>
         </Form>
       </DialogContent>
