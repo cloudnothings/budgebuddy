@@ -19,6 +19,7 @@ export async function getBudget(id: string, userId: string) {
   });
 }
 export async function updateMonthlySubcategoryBudgetAssignedAmount(
+  budgetId: string,
   categoryId: string,
   amount: number,
   month: Date,
@@ -60,6 +61,11 @@ export async function updateMonthlySubcategoryBudgetAssignedAmount(
       subcategory: {
         connect: {
           id: categoryId,
+        },
+      },
+      budget: {
+        connect: {
+          id: budgetId,
         },
       },
     },

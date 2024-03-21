@@ -6,16 +6,20 @@ import { db } from "@/db";
 import { unstable_noStore as noStore } from "next/cache";
 
 export async function updateMonthlySubcategoryBudgetAssignedAmountAction(
+  
   month: Date,
   subcategoryId: string,
   assignedAmount: number,
   monthlyBudgetId: string | null,
+  budgetId: string,
 ) {
   return await updateMonthlySubcategoryBudgetAssignedAmount(
+    budgetId,
     subcategoryId,
     assignedAmount,
     month,
     monthlyBudgetId ?? undefined,
+
   );
 }
 export async function updateCategoryNameAction(

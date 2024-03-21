@@ -2,7 +2,6 @@ import "@/styles/globals.css";
 import DashboardNav from "./_components/dashboard-nav";
 import { getAccounts } from "@/data-layer/financialAccount";
 import BudgetSidebarNav from "./_components/budget-sidebar-nav";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const metadata = {
   title: "Budge Buddy",

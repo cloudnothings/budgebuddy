@@ -36,7 +36,11 @@ export const AccountCreationDialog = ({ budgetId }: { budgetId: string }) => {
 
   }
   return (
-    <Dialog onOpenChange={() => form.reset()} >
+    <Dialog onOpenChange={() => {
+      if (form.formState.isSubmitting) {
+        form.reset()
+      }
+    }} >
       <DialogTrigger asChild>
         <Button variant={"outline"}>Create an account</Button>
       </DialogTrigger>

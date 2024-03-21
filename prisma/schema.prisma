@@ -98,6 +98,7 @@ model Budget {
     budgetAccess               BudgetAccess[]
     scheduledTransactionGroups ScheduledTransactionGroup[]
     FinancialAccount           FinancialAccount[]
+    MonthlySubcategoryBudget   MonthlySubcategoryBudget[]
 
     @@index([ownerId])
 }
@@ -169,8 +170,12 @@ model MonthlySubcategoryBudget {
     month         DateTime
     assigned      Float
 
+    budgetId String
+    budget   Budget @relation(fields: [budgetId], references: [id])
+
     @@index([subcategoryId])
-    @@index([month])
+    @@index([budgetId, month])
+    @@index([budgetId, subcategoryId, month])
 }
 
 model CategoryTarget {
