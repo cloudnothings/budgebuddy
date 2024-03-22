@@ -33,7 +33,6 @@ export const AccountCreationDialog = ({ budgetId }: { budgetId: string }) => {
   async function onSubmit(values: z.infer<typeof accountCreationFormSchema>) {
     const account = await createAccountAction({ ...values, budgetId })
     router.push(`/budgets/${budgetId}/accounts/${account.id}`)
-
   }
   return (
     <Dialog onOpenChange={() => {

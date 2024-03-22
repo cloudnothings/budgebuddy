@@ -243,7 +243,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
             onMouseLeave={() => setHovered(false)}
           >
             {isMainRow
-              ? (<div className="h-6 flex  items-center text-right justify-end">
+              ? (<div className="h-6 flex items-center text-right justify-end">
                 <div>
                   {
                     row.original.subCategories.length > 0 && new Intl.NumberFormat("en-US", {
@@ -291,7 +291,7 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
     },
     {
       accessorKey: "amount",
-      header: () => <div className="text-right">Amount</div>,
+      header: () => <div className="text-right">Activity</div>,
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("amount") ?? 0)
 
@@ -342,68 +342,66 @@ export default function BudgetCategoriesView({ month, data, budgetId }: { budget
   })
 
   return (
-    <div>
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => {
-              const isRoot = row.original.subCategories && row.original.subCategories.length > 0 ? true : false
-              return <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className={clsx(isRoot
-                  ? "bg-foreground/10"
-                  : '', 'h-11')}
-                onClick={() => {
-                  if (!isRoot) {
-                    if (row.getIsSelected()) {
-                      return;
-                    }
-                    setRowSelection({})
-                    row.toggleSelected(true)
-                  }
-                }}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <React.Fragment key={cell.id}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
+    <Table>
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => {
+              return (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
                     )}
-                  </React.Fragment>
-                ))}
-              </TableRow>
-            })) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center"
-              >
-                No results.
-              </TableCell>
+                </TableHead>
+              )
+            })}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows?.length ? (
+          table.getRowModel().rows.map((row) => {
+            const isRoot = row.original.subCategories && row.original.subCategories.length > 0 ? true : false
+            return <TableRow
+              key={row.id}
+              data-state={row.getIsSelected() && "selected"}
+              className={clsx(isRoot
+                ? "bg-foreground/10"
+                : '', 'h-11')}
+              onClick={() => {
+                if (!isRoot) {
+                  if (row.getIsSelected()) {
+                    return;
+                  }
+                  setRowSelection({})
+                  row.toggleSelected(true)
+                }
+              }}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <React.Fragment key={cell.id}>
+                  {flexRender(
+                    cell.column.columnDef.cell,
+                    cell.getContext()
+                  )}
+                </React.Fragment>
+              ))}
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          })) : (
+          <TableRow>
+            <TableCell
+              colSpan={columns.length}
+              className="h-24 text-center"
+            >
+              No results.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   )
 }
 

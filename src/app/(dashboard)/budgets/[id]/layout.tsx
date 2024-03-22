@@ -18,11 +18,11 @@ export default async function BudgetsLayout(props: {
     <div className="relative flex min-h-screen flex-col bg-background">
       <DashboardNav {...props} />
       <main className="flex-1">
-        <div className="grid grid-cols-12">
-          <div className="col-span-2">
+        <div className="flex h-[calc(100vh-57px)]">
+          <div className="w-56 border-r border-border/40 ">
             <BudgetSidebarNav {...props} accounts={accounts} />
           </div>
-          <div className="col-span-10">
+          <div className="flex-1">
             {props.children}
           </div>
         </div>
