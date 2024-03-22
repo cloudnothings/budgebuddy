@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { unstable_noStore as noStore } from "next/cache";
+import { redirect } from "next/navigation";
 
 export async function getBudget(id: string, userId: string) {
   noStore();
@@ -24,13 +25,13 @@ export async function updateMonthlySubcategoryBudgetAssignedAmount({
   amount,
   month,
   monthlySubcategoryBudgetId,
-}:
-  {budgetId: string,
-  categoryId: string,
-  amount: number,
-  month: Date,
-  monthlySubcategoryBudgetId?: string,}
-) {
+}: {
+  budgetId: string;
+  categoryId: string;
+  amount: number;
+  month: Date;
+  monthlySubcategoryBudgetId?: string;
+}) {
   noStore();
   if (monthlySubcategoryBudgetId) {
     return await db.monthlySubcategoryBudget.update({
@@ -139,6 +140,27 @@ export async function getBudgetsForUser(userId: string) {
       budgetAccess: true,
     },
   });
+}
+export async function redirectFromHomepage() {
+  noStore();
+  const user = await auth();
+
+  if (user) {
+    const budget = await db.budget.findFirst({
+      where: {
+        budgetAccess: {
+          some: {
+            userId: user.user.id,
+          },
+        },
+      },
+    });
+    if (budget) {
+      redirect(`/budgets/${budget.id}/budget`);
+    } else {
+      redirect("/home");
+    }
+  }
 }
 
 export async function createDefaultBudget(name: string, userId: string) {

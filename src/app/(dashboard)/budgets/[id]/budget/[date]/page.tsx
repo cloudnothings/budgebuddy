@@ -1,9 +1,8 @@
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import BudgetTableView from "../_components/budget-table-view"
+import BudgetTableView from "../../_components/budget-table-view"
 
-export default async function BudgetPage({ params }: { params: { id: string } }) {
-
+export default async function BudgetDatePage({ params }: { params: { id: string, date: string } }) {
   const session = await auth()
   if (!session) {
     redirect('/')

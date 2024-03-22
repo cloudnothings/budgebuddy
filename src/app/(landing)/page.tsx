@@ -1,16 +1,11 @@
 
-import { auth } from "@/auth";
 import Hero from "./hero";
-import { redirect } from "next/navigation";
+import { redirectFromHomepage } from "@/data-layer/budgets";
+
 export default async function Home() {
-  const session = await auth()
-  if (session) {
-    redirect("/home")
-  }
+  await redirectFromHomepage();
   return (
-    <>
-      <Hero />
-    </>
+    <Hero />
   )
 }
 
